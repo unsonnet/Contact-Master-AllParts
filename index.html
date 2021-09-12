@@ -1,22 +1,76 @@
-<html>
-<head>
-	<title>COP 4331 LAMP Stack Demo</title>
-	<script type="text/javascript" src="js/md5.js"></script>
-	<script type="text/javascript" src="js/code.js"></script>
-    <link href="css/styles.css" rel="stylesheet">	
-    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
-</head>
-<body>
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<!--Meta tags-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<h1 id="title">COP 4331 LAMP Stack Demo</h1>
+		<title>Contact Master</title>
+		<!-- Javat and CSS files -->
+		<script type="text/javascript" src="js/md5.js"></script>
+		<script type="text/javascript" src="js/code.js" defer></script>
+	  <link href="css/styles.css" rel="stylesheet">
+		<!--Fonts-->
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<h1 id="title">Contact <span id="step">Master</span></h1>
+		<!--Login interface//typewriter effect on inner-title-->
+		<div class="typewriter" id="loginDiv">
+			<span id="inner-title">PLEASE LOG IN.</span>
 
-<div id="loginDiv">
-	<span id="inner-title">PLEASE LOG IN</span>
-	<input type="text" id="loginName" placeholder="Username" /><br />
-	<input type="password" id="loginPassword" placeholder="Password"/><br />
-	<button type="button" id="loginButton" class="buttons" onclick="doLogin();"> Do It </button>
-	<span id="loginResult"></span>
-</div>
+			<!--Login block-->
+			<input type="text" id="loginName" placeholder="Username"/><br/>
+			<input type="password" id="loginPassword" placeholder="Password"/><br />
+			<button type="button" id="loginButton" onclick="doLogin();"> Go </button>
+			<span id="loginResult" class="loginResult"></span><br/>
 
-</body>
+			<span id="register">Don't have an account?</span>
+			<!--Registration Overlay-->
+			<div id="regOverlay" class="overlay">
+				<span class="closeBtn" onclick="closeForm();" title="Close Overlay">  &#215 </span>
+				<div class="wrap">
+					<h2 id="regTitle"> Sign up </h2>
+						<p>Fill in the fields below</p>
+						<form id="regForm" onsubmit="return false" >
+
+							<!--First Name-->
+							<input type="text" placeholder="First Name" name="firstN" required>
+								<span id="firstResult" class="loginResult"></span>
+
+							<!--Last Name-->
+							<input type="text" placeholder="Last Name" name="lastN" required>
+								<span id="lastResult" class="loginResult"></span>
+
+							<!--Email-->
+							<input type="email" placeholder="Email" name="email">
+								<span id="emailResult" class="loginResult"></span>
+
+							<!--Phone Number-->
+							<input type="text" placeholder="Phone Number (optional)" name="phoneN">
+								<span id="phoneResult" class="loginResult"></span>
+
+							<!--Username-->
+							<input type="text" placeholder="Username" name="userN" required>
+								<span id="usernameResult" class="loginResult"></span>
+
+							<!--Password-->
+							<input type="password" placeholder="Password" name="pass" required>
+								<span id="passResult" class="loginResult"></span>
+
+							<!--Password Confirmation-->
+							<input type="password" placeholder="Re-enter Password" name="passCon" required>
+								<span id="passConResult" class="loginResult"></span>
+							<input type="submit" value="Register">
+						</form>
+						<span id="regResult" class="loginResult"></span>
+				</div>
+			</div>
+
+			<!--Registration Button, to open overlay-->
+			<button class="openBtn" onclick="openForm();">Register</button>
+		</div>
+	</body>
 </html>
