@@ -48,11 +48,6 @@ function doLogin()
 					return;
 				}
 
-				if (userId == 0) {
-					document.getElementById("loginResult").innerHTML = "User/Password combination not found.";
-					return;
-				}
-
 				firstName = jsonObject.firstName;
 				lastName = jsonObject.lastName;
 
