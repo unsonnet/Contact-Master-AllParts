@@ -55,9 +55,6 @@ function doLogin()
 
 				window.location.href = "user.html";
 			}
-			if (this.status != 200) {
-				document.getElementById("loginResult").innerHTML = "Status Code: " + this.status + "\nUsername: " + login + " Password: " + password;
-			}
 		};
 		xhr.send(jsonPayload);
 	}
