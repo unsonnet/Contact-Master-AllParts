@@ -253,7 +253,7 @@ function addContact(event)
 			if (this.readyState == 4 && this.status == 200)
 			{
 				document.getElementById("contactAddResult").innerHTML = "Contact has been added, you may close the form.";
-				newForm.style.display = "none";
+				addForm.style.display = "none";
 			}
 		};
 		xhr.send(jsonPayload);
