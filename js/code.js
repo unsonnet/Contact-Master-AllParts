@@ -141,7 +141,6 @@ function doLogin()
 
 	var url = urlBase + '/Login.' + extension;
 
-    
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
@@ -149,11 +148,8 @@ function doLogin()
 	{
 		xhr.onreadystatechange = function()
 		{
-
-            document.getElementById("loginResult").innerHTML = this.readyState + " |||" + this.status + "|||| " + this.statusText; 
 			if (this.readyState == 4 && this.status == 200)
 			{
-
 				var jsonObject = JSON.parse( xhr.responseText );
 				userId = jsonObject.id;
 
