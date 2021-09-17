@@ -17,15 +17,15 @@ function doRegistration()
 	lastName = "";
 	error = "";
 
-	firstName = document.getElementById("signupFirstName").value;
+	firstName = document.getElementById("signupFirstName").value; //add these id values to registration form input
 	lastName = document.getElementById("signupLastName").value;
 
 	var login = document.getElementById("signupUserName").value;
 	var password = document.getElementById("signupPassword").value;
 	var confirmPassword = document.getElementById("signupPasswordConfirm").value;
-	// var hash = md5 ( password );
-
-	document.getElementById("signupResult").innerHTML = "";
+	
+	//There is already full form validation completed below @validateReg() function, this is left in just incase
+	/*document.getElementById("signupResult").innerHTML = "";
 
 	if (password !== confirmPassword)
 	{
@@ -43,7 +43,7 @@ function doRegistration()
 	{
 		document.getElementById("signupResult").innerHTML = "Invalid username");
 		return;
-	}
+	}*/
 
 	var jsonPayload = '{ "firstName" : "' + firstName
 					+ '", "lastName" : "' + lastName
@@ -80,7 +80,7 @@ function doRegistration()
 	}
 	catch(err)
 	{
-		document.getElementById("signupResult").innerHTML = err.message;
+		document.getElementById("regResult").innerHTML = err.message;
 	}
 
 	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
@@ -234,22 +234,15 @@ function doLogout()
 
 
 // Add - new Contacts
-function addContact()
+function addContact(event)
 {
 	//var newContact = document.getElementById("contactText").value;
 	document.getElementById("contactAddResult").innerHTML = "";
 
-	var data = {};
-	for (var i = 0, ii = addForm.length+1; i < ii; ++i) {
-		var input = addForm[i];
-		if (input.name){
-			data[input.name] = input.value;
-		} else if(i == addForm.length) {
-			data[date] = new Date();
-		}
-	}
+	var data = new FormData(event.target);
+	var value = Object.fromEntries(data.entries());
 
-	var jsonPayload = JSON.stringify( data );
+	var jsonPayload = JSON.stringify( value );
 
 	var url = urlBase + '/AddContact.' + extension;
 
@@ -405,82 +398,8 @@ function closeFormAdd(){
 newForm = document.getElementById("regForm");
 addForm = document.getElementById("addForm");
 
-if(addForm){
-	//Event listener for the submit button
-	addForm.addEventListener("submit", function(event){
-		//If form has been "submitted" without correct info before, returns html result spans to blank
-	addContact();
 
-	});
-}
-
-//Validating Form entries
-function validate(event){
-	//Check all text inputs for data longer than one character (2 min)
-	if( newForm.firstN.value.length <= 1 ){
-		document.getElementById("firstResult").innerHTML = "Your first name must be at least 2 characters";
-    		newForm.firstN.focus();
-    		return false;
-
-	//Checking for valid entry on last name
-	} else if( newForm.lastN.value.length <= 1 ){
-		document.getElementById("lastResult").innerHTML = "Your last name must be at least 2 characters";
-    		newForm.lastN.focus();
-    		return false;
-
-	//Backup check for input in the email input
-	} else if( newForm.email.value == "" ){
-		document.getElementById("emailResult").innerHTML = "Please provide your email";
-	    	newForm.email.focus();
-	    	return false;
-
-	//Checking if there is any input and if there is require it to be a number and 10 digits
-	//If there is no input it skips requirements (because its optional)
-	} else if(newForm.phoneN.value.length >= 1){
-		if(isNaN(newForm.phoneN.value) || newForm.phoneN.value.length != 10 ){
-			document.getElementById("phoneResult").innerHTML = "Phone number must be 10 digits";
-	    		newForm.phoneN.focus();
-	    		return false;
-		}
-
-	//Checking for username minimum value
-	} else if( newForm.userN.value.length < 4 || newForm.userN.value.length > 50){
-		document.getElementById("usernameResult").innerHTML = "Your username must be at least 4 characters";
-    		newForm.lastN.focus();
-    		return false;
-
-	//Password Field minimum
-	//Password Value needs a minimum of 7 digits
-	} else if(newForm.pass.value.length < 7){
-		document.getElementById("passResult").innerHTML = "Your Password must be at least 7 characters";
-		newForm.pass.focus();
-		return false;
-
-	//Password Confirmation
-	} else if(newForm.passCon.value != newForm.pass.value){
-		document.getElementById("passConResult").innerHTML = "Your passwords do not match";
-		newForm.pass.focus();
-		return false;
-
-  	}else{
-    		return true;
-  	}
-}
-
-//Checking for a valid email input
-function validEmail(){
-	var email = newForm.email.value;
-	at = email.indexOf("@");
-	dot = email.lastIndexOf(".");
-	if( at < 1 || (dot - at < 2) || dot == email.length ){
-		document.getElementById("emailResult").innerHTML = "Provided email is incorrect";
-		newForm.email.focus();
-		return false;
-	}
-	return true;
-}
-
-//Make sure this is only being called on valid pages i.e. index registration
+//Registration Validation/registration function
 if(newForm){
 	//Event listener for the submit button
 	newForm.addEventListener("submit", function(event){
@@ -490,58 +409,102 @@ if(newForm){
 			//iterate between each span and make innerHTML "" (blank) to avoid buildup
 			document.getElementsByClassName("loginResult")[i].innerHTML = "";
 		}
-		if( validate(event) ){
-	    	//if the forms all have the basic proper input call the email validation
-	    		if( !validEmail(event) ){
-		    	//returns false if the email is invalid
-		    	//handleForm(event);
-		    		return;
-					}
-			userRegistration();
+		if( validateReg(event) ){
+			doRegistration();
 		}
 	});
 }
 
-function userRegistration()
-{
-	sendData();
-	newForm.style.display = "none";  //Makes the form go away and let's the user know they've been registered
-	document.getElementById("regResult").innerHTML = "You've been registered! You can close the form and login.";
+//AddContact validation and addContact() function
+if(addForm){
+	//Event listener for the submit button
+	addForm.addEventListener("submit", function(event){
+		var num = document.getElementsByClassName("loginResult");
+		for(var i = 0; i < num.length; i++){
+			//iterate between each span and make innerHTML "" (blank) to avoid buildup
+			document.getElementsByClassName("loginResult")[i].innerHTML = "";
+		}
+		if( validateAdd(event) ){
+			/*if( !validEmail(event) ){
+				return;
+			} else{*/
+				addContact(event);
+			//}
+		}
+	});
 }
 
-function sendData(){  //Sends Registration Data
-  //console.log( 'Sending data' );
-	var data = {};
-  for (var i = 0, ii = newForm.length; i < ii; ++i) {
-    var input = newForm[i];
-    if (input.name){
-      data[input.name] = input.value;
-    }
-  }
+//Validating Reg Form entries
+function validateReg(event){
 
-  var xhr = new XMLHttpRequest();
-	var url = urlBase + '/Registration.' + extension; //NEED proper .php filename
-	var jsonPayload = JSON.stringify( data );
-  // Set up our request
-  xhr.open(newForm.method, newForm.action, true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	if( newForm.FirstName.value.length <= 1 ){
+		document.getElementById("firstResult").innerHTML = "Your first name must be at least 2 characters";
+    		return false;
 
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				//document.getElementById("contactAddResult").innerHTML = "Contact has been added";
-				//newForm.style.display = "none";
-			}
-		};
-		xhr.send(jsonPayload);
+	} else if( newForm.LastName.value.length <= 1 ){
+		document.getElementById("lastResult").innerHTML = "Your last name must be at least 2 characters";
+    		return false;
+
+	} else if( newForm.Login.value.length < 4 || newForm.Login.value.length > 50){
+		document.getElementById("usernameResult").innerHTML = "Your username must be at least 4 characters";
+    		return false;
+
+	} else if(newForm.Password.value.length < 7){
+		document.getElementById("passResult").innerHTML = "Your Password must be at least 7 characters";
+		return false;
+
+	} else if(newForm.passCon.value != newForm.Password.value){
+		document.getElementById("passConResult").innerHTML = "Your passwords do not match";
+		return false;
+
+  	}else{
+    		return true;
+  	}
+}
+
+function validateAdd(event){  // Validating Added Contact Entries, issues with checking email
+
+	if( addForm.FirstName.value.length <= 1 ){
+		document.getElementById("addFirst").innerHTML = "First names must be at least 2 characters";
+		return false;
+
+	} else if( addForm.LastName.value.length <= 1 ){
+		document.getElementById("addLast").innerHTML = "Last names must be at least 2 characters";
+		return false;
+
+	} else if( addForm.Phonenumber.value.length <= 1 ){
+		//console.log(addForm.Phonenumber.value.length);
+		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
+		return false;
+
+	} else if( addForm.Phonenumber.value.length >= 1 ){
+		if( isNaN(addForm.Phonenumber.value) || addForm.Phonenumber.value.length != 10 ){
+			//console.log(addForm.Phonenumber.value.length);
+			document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
+			return false;
+		}
+		//console.log(addForm.Email.value.length);
+	} else if( addForm.Email.value.length <= 1 ){
+		//console.log(addForm.Email.value.length);
+		document.getElementById("addEmail").innerHTML = "Please provide an email";
+		return false;
+
+	}else{
+		return true;
 	}
-	catch(err)
-	{
-		document.getElementById("contactAddResult").innerHTML = err.message;
+}
+
+//Checking for a valid email input
+function validEmail(event){
+	var email = newForm.email.value;
+	at = email.indexOf("@");
+	dot = email.lastIndexOf(".");
+	if( at < 1 || (dot - at < 2) || dot == email.length ){
+		document.getElementById("emailResult").innerHTML = "Provided email is incorrect";
+		newForm.email.focus();
+		return false;
 	}
+	return true;
 }
 
 
