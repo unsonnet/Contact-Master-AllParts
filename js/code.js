@@ -1,9 +1,125 @@
+//TODO:
+//Registration information fields submission
+//Finish Update/Delete (Determine if update is needed, complete delete function)
+//Connect to API
+
 var urlBase = 'http://contactmaster.xyz/LAMPAPI';
 var extension = 'php';
 
 var userId = 0;
 var firstName = "";
 var lastName = "";
+
+function doRegistration()
+{
+	userID = 0;
+	firstName = "";
+	lastName = "";
+	error = "";
+
+	firstName = document.getElementById("signupFirstName").value; //add these id values to registration form input
+	lastName = document.getElementById("signupLastName").value;
+
+	var login = document.getElementById("signupUserName").value;
+	var password = document.getElementById("signupPassword").value;
+	var confirmPassword = document.getElementById("signupPasswordConfirm").value;
+	
+	//There is already full form validation completed below @validateReg() function, this is left in just incase
+	/*document.getElementById("signupResult").innerHTML = "";
+	if (password !== confirmPassword)
+	{
+		document.getElementById("signupResult").innerHTML = "Passwords do not match";
+		return;
+	}
+	if (password === "" || password === null)
+	{
+		document.getElementById("signupResult").innerHTML = "Passwords do not match";
+		return;
+	}
+	if (login === "" || login === null)
+	{
+		document.getElementById("signupResult").innerHTML = "Invalid username");
+		return;
+	}*/
+
+	var jsonPayload = '{ "firstName" : "' + firstName
+					+ '", "lastName" : "' + lastName
+					+ '", "login" : "'    + login
+					+ '", "password" : "' + hash + '" }';
+
+	var url = urlBase + '/Regstration.' + extension;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.send(jsonPayload);
+
+		var jsonObject = JSON.parse( xhr.responseText );
+
+		userID = jsonObject.userID;
+		error = jsonObject.error;
+
+		// If error is not empty
+		if( error !== "" )
+		{
+			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
+			return;
+		}
+
+		firstName = jsonObject.firstName;
+		lastName = jsonObject.lastName;
+
+		saveCookie();
+
+		window.location.href = "contacts.html";
+	}
+	catch(err)
+	{
+		document.getElementById("regResult").innerHTML = err.message;
+	}
+
+	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
+}					+ '", "lastName" : "' + lastName
+					+ '", "login" : "'    + login
+					+ '", "password" : "' + hash + '" }';
+
+	var url = urlBase + '/Registration.' + extension;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.send(jsonPayload);
+
+		var jsonObject = JSON.parse( xhr.responseText );
+
+		userID = jsonObject.userID;
+		error = jsonObject.error;
+
+		// If error is not empty
+		if( error !== "" )
+		{
+			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
+			return;
+		}
+
+		firstName = jsonObject.firstName;
+		lastName = jsonObject.lastName;
+
+		saveCookie();
+
+		window.location.href = "contacts.html";
+	}
+	catch(err)
+	{
+		document.getElementById("signupResult").innerHTML = err.message;
+	}
+
+	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
+}
 
 function doLogin()
 {
@@ -21,15 +137,20 @@ function doLogin()
 
 	var url = urlBase + '/Login.' + extension;
 
+    
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
 		xhr.onreadystatechange = function()
 		{
+
+            document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText; 
 			if (this.readyState == 4 && this.status == 200)
 			{
+
+
 				var jsonObject = JSON.parse( xhr.responseText );
 				userId = jsonObject.id;
 
@@ -53,6 +174,8 @@ function doLogin()
 	{
 		document.getElementById("loginResult").innerHTML = err.message;
 	}
+
+    //document.getElementById("loginResult").innerHTML = "Gottem";
 }
 
 function saveCookie()
@@ -110,7 +233,7 @@ function doLogout()
 // Add - new Contacts
 function addContact(event)
 {
-	event.preventDefault();
+	//var newContact = document.getElementById("contactText").value;
 	document.getElementById("contactAddResult").innerHTML = "";
 
 	var data = new FormData(event.target);
@@ -122,7 +245,7 @@ function addContact(event)
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
 		xhr.onreadystatechange = function()
@@ -130,7 +253,7 @@ function addContact(event)
 			if (this.readyState == 4 && this.status == 200)
 			{
 				document.getElementById("contactAddResult").innerHTML = "Contact has been added, you may close the form.";
-				addForm.style.display = "none";
+				newForm.style.display = "none";
 			}
 		};
 		xhr.send(jsonPayload);
@@ -157,7 +280,7 @@ function searchContact()
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
 		xhr.onreadystatechange = function()
@@ -211,12 +334,14 @@ function openFormAdd(){
 function closeFormReg(){
 	document.getElementById("regOverlay").style.display = "none";
 
-	// If form display is none, then reg was successful, reload the page index.html
+	//makes the form reappear if opened again
 	if(newForm.style.display == "none"){
+		//newForm.style.display = "inline";
 		location.reload();
 		return false;
 
-	} else {	//IF we reach here then user did not complete registration, clear the result and input fields
+	} else {
+
 		var num = document.getElementsByClassName("loginResult");
 		var inputs = newForm.elements;
 
@@ -228,7 +353,7 @@ function closeFormReg(){
 		  }
 		}
 
-		//iterate between each span and make innerHTML of result response "" (blank) to avoid buildup
+		//iterate between each span and make innerHTML "" (blank) to avoid buildup
 		for(var i = 0; i < num.length; i++){
 			document.getElementsByClassName("loginResult")[i].innerHTML = "";
 		}
@@ -241,6 +366,7 @@ function closeFormAdd(){
 
 	//makes the form reappear if opened again
 	if(addForm.style.display == "none"){
+		//newForm.style.display = "inline";
 		location.reload();
 		return false;
 
@@ -251,7 +377,7 @@ function closeFormAdd(){
 
 		//clears all input fields, except for the button
 		for (i = 0; i < inputs.length; i++) {
-		  if(inputs[i].nodeName === "INPUT" && inputs[i].type === "text" || inputs[i].nodeName === "INPUT" && inputs[i].type === "email") {
+		  if (inputs[i].nodeName === "INPUT" && inputs[i].type === "text" || inputs[i].nodeName === "INPUT" && inputs[i].type === "email") {
 		    // Update text input
 		    inputs[i].value = "";
 		  }
@@ -265,9 +391,47 @@ function closeFormAdd(){
 }
 
 
+//Registration Form
+newForm = document.getElementById("regForm");
+addForm = document.getElementById("addForm");
 
 
-//Validating registration Form entries
+//Registration Validation/registration function
+if(newForm){
+	//Event listener for the submit button
+	newForm.addEventListener("submit", function(event){
+		//If form has been "submitted" without correct info before, returns html result spans to blank
+		var num = document.getElementsByClassName("loginResult");
+		for(var i = 0; i < num.length; i++){
+			//iterate between each span and make innerHTML "" (blank) to avoid buildup
+			document.getElementsByClassName("loginResult")[i].innerHTML = "";
+		}
+		if( validateReg(event) ){
+			doRegistration();
+		}
+	});
+}
+
+//AddContact validation and addContact() function
+if(addForm){
+	//Event listener for the submit button
+	addForm.addEventListener("submit", function(event){
+		var num = document.getElementsByClassName("loginResult");
+		for(var i = 0; i < num.length; i++){
+			//iterate between each span and make innerHTML "" (blank) to avoid buildup
+			document.getElementsByClassName("loginResult")[i].innerHTML = "";
+		}
+		if( validateAdd(event) ){
+			/*if( !validEmail(event) ){
+				return;
+			} else{*/
+				addContact(event);
+			//}
+		}
+	});
+}
+
+//Validating Reg Form entries
 function validateReg(event){
 
 	if( newForm.FirstName.value.length <= 1 ){
@@ -295,7 +459,7 @@ function validateReg(event){
   	}
 }
 
-function validateAdd(event){  // Validating Added Contact Entries
+function validateAdd(event){  // Validating Added Contact Entries, issues with checking email
 
 	if( addForm.FirstName.value.length <= 1 ){
 		document.getElementById("addFirst").innerHTML = "First names must be at least 2 characters";
@@ -306,19 +470,19 @@ function validateAdd(event){  // Validating Added Contact Entries
 		return false;
 
 	} else if( addForm.Phonenumber.value.length <= 1 ){
-		console.log(addForm.Phonenumber.value.length);
+		//console.log(addForm.Phonenumber.value.length);
 		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
 		return false;
 
 	} else if( addForm.Phonenumber.value.length >= 1 ){
 		if( isNaN(addForm.Phonenumber.value) || addForm.Phonenumber.value.length != 10 ){
-			console.log(addForm.Phonenumber.value.length);
+			//console.log(addForm.Phonenumber.value.length);
 			document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
 			return false;
 		}
-		console.log(addForm.Email.value.length);
+		//console.log(addForm.Email.value.length);
 	} else if( addForm.Email.value.length <= 1 ){
-		console.log(addForm.Email.value.length);
+		//console.log(addForm.Email.value.length);
 		document.getElementById("addEmail").innerHTML = "Please provide an email";
 		return false;
 
@@ -329,86 +493,15 @@ function validateAdd(event){  // Validating Added Contact Entries
 
 //Checking for a valid email input
 function validEmail(event){
-	var email = addForm.Email.value;
+	var email = newForm.email.value;
 	at = email.indexOf("@");
 	dot = email.lastIndexOf(".");
-
 	if( at < 1 || (dot - at < 2) || dot == email.length ){
-		document.getElementById("addEmail").innerHTML = "Provided email is incorrect";
+		document.getElementById("emailResult").innerHTML = "Provided email is incorrect";
+		newForm.email.focus();
 		return false;
 	}
-
 	return true;
-}
-
-//Registration Form
-newForm = document.getElementById("regForm");
-addForm = document.getElementById("addForm");
-
-if(addForm){
-	//Event listener for the submit button
-	addForm.addEventListener("submit", function(event){
-		var num = document.getElementsByClassName("loginResult");
-		for(var i = 0; i < num.length; i++){
-			//iterate between each span and make innerHTML "" (blank) to avoid buildup
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-		if( validateAdd(event) ){
-			if( !validEmail(event) ){
-				return;
-			} else{
-				addContact(event);
-			}
-		}
-	});
-}
-
-//Make sure this is only being called on valid pages i.e. index registration
-if(newForm){
-	//Event listener for the submit button
-	newForm.addEventListener("submit", function(event){
-		//If form has been "submitted" without correct info before, returns html result spans to blank
-		var num = document.getElementsByClassName("loginResult");
-		for(var i = 0; i < num.length; i++){
-			//iterate between each span and make innerHTML "" (blank) to avoid buildup
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-		if( validateReg(event) ){
-			userRegistration(event);
-		}
-	});
-}
-
-function userRegistration(event){  //Sends Registration Data
-	event.preventDefault();
-	document.getElementById("regResult").innerHTML = "";
-
-	var data = new FormData(event.target);
-	var value = Object.fromEntries(data.entries());
-
-  var xhr = new XMLHttpRequest();
-	var url = urlBase + '/Registration.' + extension; //NEED proper .php filename
-	var jsonPayload = JSON.stringify( value );
-  // Set up our request
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				newForm.style.display = "none";  //Makes the form go away and let's the user know they've been registered
-				document.getElementById("regResult").innerHTML = "You've been registered! You can close the form and login.";
-			}
-		};
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("regResult").innerHTML = err.message;
-	}
 }
 
 
