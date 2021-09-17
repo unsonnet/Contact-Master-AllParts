@@ -10,6 +10,120 @@ var userId = 0;
 var firstName = "";
 var lastName = "";
 
+function doRegistration()
+{
+	userID = 0;
+	firstName = "";
+	lastName = "";
+	error = "";
+
+	firstName = document.getElementById("signupFirstName").value;
+	lastName = document.getElementById("signupLastName").value;
+
+	var login = document.getElementById("signupUserName").value;
+	var password = document.getElementById("signupPassword").value;
+	var confirmPassword = document.getElementById("signupPasswordConfirm").value;
+	// var hash = md5 ( password );
+
+	document.getElementById("signupResult").innerHTML = "";
+
+	if (password !== confirmPassword)
+	{
+		document.getElementById("signupResult").innerHTML = "Passwords do not match";
+		return;
+	}
+
+	if (password === "" || password === null)
+	{
+		document.getElementById("signupResult").innerHTML = "Passwords do not match";
+		return;
+	}
+
+	if (login === "" || login === null)
+	{
+		document.getElementById("signupResult").innerHTML = "Invalid username");
+		return;
+	}
+
+	var jsonPayload = '{ "firstName" : "' + firstName
+					+ '", "lastName" : "' + lastName
+					+ '", "login" : "'    + login
+					+ '", "password" : "' + hash + '" }';
+
+	var url = urlBase + '/Regstration.' + extension;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.send(jsonPayload);
+
+		var jsonObject = JSON.parse( xhr.responseText );
+
+		userID = jsonObject.userID;
+		error = jsonObject.error;
+
+		// If error is not empty
+		if( error !== "" )
+		{
+			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
+			return;
+		}
+
+		firstName = jsonObject.firstName;
+		lastName = jsonObject.lastName;
+
+		saveCookie();
+
+		window.location.href = "contacts.html";
+	}
+	catch(err)
+	{
+		document.getElementById("signupResult").innerHTML = err.message;
+	}
+
+	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
+}					+ '", "lastName" : "' + lastName
+					+ '", "login" : "'    + login
+					+ '", "password" : "' + hash + '" }';
+
+	var url = urlBase + '/Registration.' + extension;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, false);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.send(jsonPayload);
+
+		var jsonObject = JSON.parse( xhr.responseText );
+
+		userID = jsonObject.userID;
+		error = jsonObject.error;
+
+		// If error is not empty
+		if( error !== "" )
+		{
+			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
+			return;
+		}
+
+		firstName = jsonObject.firstName;
+		lastName = jsonObject.lastName;
+
+		saveCookie();
+
+		window.location.href = "contacts.html";
+	}
+	catch(err)
+	{
+		document.getElementById("signupResult").innerHTML = err.message;
+	}
+
+	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
+}
+
 function doLogin()
 {
 	userId = 0;
