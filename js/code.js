@@ -64,7 +64,7 @@ function doRegistration()
 		// If error is not empty
 		if( error !== "" )
 		{
-			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
+			document.getElementById("regResult").innerHTML = "Sign Up Failed";
 			return;
 		}
 
@@ -73,7 +73,7 @@ function doRegistration()
 
 		saveCookie();
 
-		window.location.href = "contacts.html";
+		window.location.href = "index.html";
 	}
 	catch(err)
 	{
@@ -81,7 +81,8 @@ function doRegistration()
 	}
 
 	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
-}					+ '", "lastName" : "' + lastName
+	//---Looks like a duplicate portion
+}					/*+ '", "lastName" : "' + lastName
 					+ '", "login" : "'    + login
 					+ '", "password" : "' + hash + '" }';
 
@@ -119,7 +120,7 @@ function doRegistration()
 	}
 
 	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
-}
+}*/
 
 function doLogin()
 {
