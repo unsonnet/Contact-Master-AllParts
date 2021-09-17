@@ -119,8 +119,8 @@ function doRegistration()
 		document.getElementById("signupResult").innerHTML = err.message;
 	}
 
-	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";*/
-}
+	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
+}*/
 
 function doLogin()
 {
