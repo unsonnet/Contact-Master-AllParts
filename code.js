@@ -35,9 +35,10 @@ function doLogin()
 		xhr.onreadystatechange = function()
 		{
 
-            document.getElementById("loginResult").innerHTML = this.readyState + " |||" + this.status + "|||| " + this.statusText; 
+            document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText; 
 			if (this.readyState == 4 && this.status == 200)
 			{
+
 
 				var jsonObject = JSON.parse( xhr.responseText );
 				userId = jsonObject.id;
@@ -62,6 +63,8 @@ function doLogin()
 	{
 		document.getElementById("loginResult").innerHTML = err.message;
 	}
+
+    //document.getElementById("loginResult").innerHTML = "Gottem";
 }
 
 function saveCookie()
