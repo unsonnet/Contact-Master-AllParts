@@ -14,7 +14,7 @@
 		$stmt->execute();
 
 		if ($conn->affected_rows == 0) {
-			returnWithError("Record Already Exists");
+			returnWithError("Username Unavailable");
 		} else {
 			returnWithError("");
 		}
