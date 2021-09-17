@@ -9,15 +9,11 @@
 	if ($conn->connect_error) {
 		returnWithError($conn->connect_error);
 	} else {
-		$stmt = $conn->prepare("INSERT IGNORE INTO Contacts (FirstName,LastName,Phonenumber,Email,UserID) VALUES (?,?,?,?,?);");
+		$stmt = $conn->prepare("INSERT INTO Contacts (FirstName,LastName,Phonenumber,Email,UserID) VALUES (?,?,?,?,?);");
 		$stmt->bind_param("ssssi", $inData["firstName"], $inData["lastName"], $inData["phonenumber"], $inData["email"], $inData["userid"]);
 		$stmt->execute();
 
-		if ($conn->affected_rows == 0) {
-			returnWithError("Record Already Exists");
-		} else {
-			returnWithError("");
-		}
+		returnWithError("");
 
 		$stmt->close();
 		$conn->close();

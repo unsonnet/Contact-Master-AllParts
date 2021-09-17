@@ -14,7 +14,7 @@
 		$stmt->execute();
 
 		if ($conn->affected_rows == 0) {
-			returnWithError("No Records Found");
+			returnWithError("No Change");
 		} else {
 			returnWithError("");
 		}
