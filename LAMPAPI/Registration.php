@@ -33,7 +33,7 @@
 	}
 	
 	function returnWithError($err) {
-		$retValue = '{"id":0, error":"'.$err.'"}';
+		$retValue = '{"id":0, "error":"'.$err.'"}';
 		sendResultInfoAsJson($retValue);
 	}
 

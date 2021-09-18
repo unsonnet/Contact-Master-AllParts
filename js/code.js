@@ -25,6 +25,7 @@ function doRegistration()
 
 	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, login:login, password:password});
 
+
 	var url = urlBase + '/Registration.' + extension;
 
 	var xhr = new XMLHttpRequest();
@@ -36,7 +37,7 @@ function doRegistration()
 		{
 			if (this.readyState == 4 && this.status == 200)
 			{
-				document.getElementById("regResult").innerHTML = "Registration Complete. Close the form and login";
+				document.getElementById("regResult").innerHTML = "Registration Complete. Close the form and login.";
 				newForm.style.display = "none";
 			}
 		};
@@ -47,8 +48,6 @@ function doRegistration()
 		document.getElementById("regResult").innerHTML = err.message;
 	}
 }
-
-
 
 
 function doLogin()
@@ -104,6 +103,8 @@ function doLogin()
 	{
 		document.getElementById("loginResult").innerHTML = err.message;
 	}
+
+    //document.getElementById("loginResult").innerHTML = "Gottem";
 }
 
 function saveCookie()
@@ -159,23 +160,22 @@ function doLogout()
 
 
 // Add - new Contacts
-function addContact()
+function addContact(event)
 {
 	document.getElementById("contactAddResult").innerHTML = "";
-
+  
 	error = "";
 	userID = 0;
 
 	firstName = "";
 	lastName = "";
 
-	firstName = document.getElementById("add_name").value; //add these id values to registration form input
+	firstName = document.getElementById("add_name").value; //add these id values to addContact form input
 	lastName = document.getElementById("add_lastname").value;
 	var phoneNumber = document.getElementById("add_phonenumber").value;
 	var email = document.getElementById("add_email").value;
 
-	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, phoneNumber:phoneNumber,email:email});
-
+	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, phonenumber:phoneNumber, email:email, userid:1});
 
 	var url = urlBase + '/AddContact.' + extension;
 	var xhr = new XMLHttpRequest();
