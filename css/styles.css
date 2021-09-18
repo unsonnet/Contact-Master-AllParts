@@ -237,10 +237,8 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
   opacity: 1;
   display: inline-block;
   font-size: 0.8em;
-  width: 90%;
   text-align: center;
   margin-top: 2%;
-  margin-left: 5%;
   margin-bottom: 2%;
   font-family: 'Montserrat', sans-serif;
   color: #DB3737;
@@ -251,7 +249,7 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focu
 }
 
 .wrap{
-  max-width: 70%;
+  max-width: 40%;
   margin: auto;
   padding: 0.75em;
   background: rgba(28, 30, 42, 0.9);

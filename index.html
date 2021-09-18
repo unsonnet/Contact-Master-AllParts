@@ -23,7 +23,9 @@
 		<h1 id="title">Contact <span id="step">Master</span></h1>
 		<!--Login interface//typewriter effect on inner-title-->
 		<div class="typewriter" id="loginDiv">
+
 			<span id="inner-title">PLEASE LOG IN.</span>
+			<!--<img src="images/ucf.gif" style="border-radius: 20px; bottom: 10px;">-->
 
 			<!--Login block-->
 			<input type="text" id="loginName" placeholder="Username">
@@ -41,15 +43,15 @@
 						<form id="regForm" onsubmit="return false;">
 
 							<!--First Name-->
-							<input type="text" placeholder="First Name" name="FirstName" required>
+							<input type="text" placeholder="First Name" name="FirstName" id="FirstName" required>
 								<span id="firstResult" class="loginResult"></span>
 
 							<!--Last Name-->
-							<input type="text" placeholder="Last Name" name="LastName" required>
+							<input type="text" placeholder="Last Name" name="LastName" id="LastName"required>
 								<span id="lastResult" class="loginResult"></span>
 
 							<!--Username-->
-							<input type="text" placeholder="Username" name="Login" required>
+							<input type="text" placeholder="Username" name="Login" id="Login" required>
 								<span id="usernameResult" class="loginResult"></span>
 
 							<!--Password-->
@@ -57,7 +59,7 @@
 								<span id="passResult" class="loginResult"></span>
 
 							<!--Password Confirmation-->
-							<input type="password" placeholder="Re-enter Password" name="passCon" required>
+							<input type="password" placeholder="Re-enter Password" name="passCon" id="passCon" required>
 								<span id="passConResult" class="loginResult"></span>
 							<input type="submit" value="Register">
 						</form>

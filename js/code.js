@@ -17,110 +17,38 @@ function doRegistration()
 	lastName = "";
 	error = "";
 
-	firstName = document.getElementById("signupFirstName").value; //add these id values to registration form input
-	lastName = document.getElementById("signupLastName").value;
+	firstName = document.getElementById("FirstName").value; //add these id values to registration form input
+	lastName = document.getElementById("LastName").value;
 
-	var login = document.getElementById("signupUserName").value;
-	var password = document.getElementById("signupPassword").value;
-	var confirmPassword = document.getElementById("signupPasswordConfirm").value;
-	
-	//There is already full form validation completed below @validateReg() function, this is left in just incase
-	/*document.getElementById("signupResult").innerHTML = "";
-	if (password !== confirmPassword)
-	{
-		document.getElementById("signupResult").innerHTML = "Passwords do not match";
-		return;
-	}
-	if (password === "" || password === null)
-	{
-		document.getElementById("signupResult").innerHTML = "Passwords do not match";
-		return;
-	}
-	if (login === "" || login === null)
-	{
-		document.getElementById("signupResult").innerHTML = "Invalid username");
-		return;
-	}*/
+	var login = document.getElementById("Login").value;
+	var password = document.getElementById("passCon").value;
 
-	var jsonPayload = '{ "firstName" : "' + firstName
-					+ '", "lastName" : "' + lastName
-					+ '", "login" : "'    + login
-					+ '", "password" : "' + hash + '" }';
+	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, login:login, password:password});
 
-	var url = urlBase + '/Regstration.' + extension;
+
+	var url = urlBase + '/Registration.' + extension;
 
 	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, false);
+	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 	try
 	{
-		xhr.send(jsonPayload);
-
-		var jsonObject = JSON.parse( xhr.responseText );
-
-		userID = jsonObject.userID;
-		error = jsonObject.error;
-
-		// If error is not empty
-		if( error !== "" )
+		xhr.onreadystatechange = function()
 		{
-			document.getElementById("regResult").innerHTML = "Sign Up Failed";
-			return;
-		}
-
-		firstName = jsonObject.firstName;
-		lastName = jsonObject.lastName;
-
-		saveCookie();
-
-		window.location.href = "index.html";
+			if (this.readyState == 4 && this.status == 200)
+			{
+				document.getElementById("regResult").innerHTML = "Registration Complete. Close the form and login.";
+				newForm.style.display = "none";
+			}
+		};
+		xhr.send(jsonPayload);
 	}
 	catch(err)
 	{
 		document.getElementById("regResult").innerHTML = err.message;
 	}
+}
 
-	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
-	//---Looks like a duplicate portion
-}					/*+ '", "lastName" : "' + lastName
-					+ '", "login" : "'    + login
-					+ '", "password" : "' + hash + '" }';
-
-	var url = urlBase + '/Registration.' + extension;
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, false);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	try
-	{
-		xhr.send(jsonPayload);
-
-		var jsonObject = JSON.parse( xhr.responseText );
-
-		userID = jsonObject.userID;
-		error = jsonObject.error;
-
-		// If error is not empty
-		if( error !== "" )
-		{
-			document.getElementById("signupResult").innerHTML = "Sign Up Failed";
-			return;
-		}
-
-		firstName = jsonObject.firstName;
-		lastName = jsonObject.lastName;
-
-		saveCookie();
-
-		window.location.href = "contacts.html";
-	}
-	catch(err)
-	{
-		document.getElementById("signupResult").innerHTML = err.message;
-	}
-
-	document.getElementById('userName').innerHTML = "Welcome, " + firstName + " " + lastName + "!";
-}*/
 
 function doLogin()
 {
@@ -234,16 +162,22 @@ function doLogout()
 // Add - new Contacts
 function addContact(event)
 {
-	//var newContact = document.getElementById("contactText").value;
 	document.getElementById("contactAddResult").innerHTML = "";
+  
+	error = "";
+	userID = 0;
 
-	var data = new FormData(event.target);
-	var value = Object.fromEntries(data.entries());
+	firstName = "";
+	lastName = "";
 
-	var jsonPayload = JSON.stringify( value );
+	firstName = document.getElementById("add_name").value; //add these id values to addContact form input
+	lastName = document.getElementById("add_lastname").value;
+	var phoneNumber = document.getElementById("add_phonenumber").value;
+	var email = document.getElementById("add_email").value;
+
+	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, phonenumber:phoneNumber, email:email, userid:1});
 
 	var url = urlBase + '/AddContact.' + extension;
-
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
@@ -393,8 +327,8 @@ function closeFormAdd(){
 
 
 //Registration Form
-newForm = document.getElementById("regForm");
-addForm = document.getElementById("addForm");
+var newForm = document.getElementById("regForm");
+var addForm = document.getElementById("addForm");
 
 
 //Registration Validation/registration function
@@ -423,11 +357,7 @@ if(addForm){
 			document.getElementsByClassName("loginResult")[i].innerHTML = "";
 		}
 		if( validateAdd(event) ){
-			/*if( !validEmail(event) ){
-				return;
-			} else{*/
-				addContact(event);
-			//}
+				addContact();
 		}
 	});
 }
