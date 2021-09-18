@@ -66,7 +66,7 @@ function doLogin()
 
 	var url = urlBase + '/Login.' + extension;
 
-    
+
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
@@ -75,7 +75,7 @@ function doLogin()
 		xhr.onreadystatechange = function()
 		{
 
-            document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText; 
+            document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText;
 			if (this.readyState == 4 && this.status == 200)
 			{
 
@@ -163,7 +163,7 @@ function doLogout()
 function addContact(event)
 {
 	document.getElementById("contactAddResult").innerHTML = "";
-  
+
 	error = "";
 	userID = 0;
 
@@ -356,8 +356,11 @@ if(addForm){
 			//iterate between each span and make innerHTML "" (blank) to avoid buildup
 			document.getElementsByClassName("loginResult")[i].innerHTML = "";
 		}
-		if( validateAdd(event) ){
-				addContact();
+		if( validateAdd(event)){
+			if(!validEmail(event)){
+				return false;
+			}
+			addContact();
 		}
 	});
 }
@@ -400,20 +403,17 @@ function validateAdd(event){  // Validating Added Contact Entries, issues with c
 		document.getElementById("addLast").innerHTML = "Last names must be at least 2 characters";
 		return false;
 
-	} else if( addForm.Phonenumber.value.length <= 1 ){
-		//console.log(addForm.Phonenumber.value.length);
+	}else if(addForm.Phonenumber.value.length < 1){
 		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
 		return false;
 
-	} else if( addForm.Phonenumber.value.length >= 1 ){
-		if( isNaN(addForm.Phonenumber.value) || addForm.Phonenumber.value.length != 10 ){
-			//console.log(addForm.Phonenumber.value.length);
-			document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
-			return false;
-		}
-		//console.log(addForm.Email.value.length);
-	} else if( addForm.Email.value.length <= 1 ){
-		//console.log(addForm.Email.value.length);
+
+	}else if( isNaN(addForm.Phonenumber.value) || addForm.Phonenumber.value.length != 10  ){
+		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
+		return false;
+
+
+	} else if( addForm.Email.value.length <= 1 || addForm.Email.value == ""){
 		document.getElementById("addEmail").innerHTML = "Please provide an email";
 		return false;
 
@@ -424,12 +424,11 @@ function validateAdd(event){  // Validating Added Contact Entries, issues with c
 
 //Checking for a valid email input
 function validEmail(event){
-	var email = newForm.email.value;
+	var email = addForm.Email.value;
 	at = email.indexOf("@");
 	dot = email.lastIndexOf(".");
 	if( at < 1 || (dot - at < 2) || dot == email.length ){
-		document.getElementById("emailResult").innerHTML = "Provided email is incorrect";
-		newForm.email.focus();
+		document.getElementById("addEmail").innerHTML = "Provided email is incorrect";
 		return false;
 	}
 	return true;
