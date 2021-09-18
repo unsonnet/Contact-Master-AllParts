@@ -1,5 +1,4 @@
 //TODO:
-//Registration information fields submission
 //Finish Update/Delete (Determine if update is needed, complete delete function)
 //Connect to API
 
@@ -12,18 +11,20 @@ var lastName = "";
 
 function doRegistration()
 {
-	userID = 0;
+	//This is only needed to change the change active accounts login/logout
+	/*userID = 0;
 	firstName = "";
 	lastName = "";
-	error = "";
+	error = "";*/
 
-	firstName = document.getElementById("FirstName").value; //add these id values to registration form input
-	lastName = document.getElementById("LastName").value;
+	//This is the data sendinf payload variables
+	var fN = document.getElementById("FirstName").value; //add these id values to registration form input
+	var lN = document.getElementById("LastName").value;
 
 	var login = document.getElementById("Login").value;
 	var password = document.getElementById("passCon").value;
 
-	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, login:login, password:password});
+	var jsonPayload = JSON.stringify({firstName:fN, lastName:lN, login:login, password:password});
 
 
 	var url = urlBase + '/Registration.' + extension;
@@ -37,10 +38,11 @@ function doRegistration()
 		{
 			if (this.readyState == 4 && this.status == 200)
 			{
-				document.getElementById("regResult").innerHTML = "Registration Complete. Close the form and login.";
 				newForm.style.display = "none";
+				document.getElementById("regResult").innerHTML = "Registration Complete. Close the menu and login.";
 			}
 		};
+
 		xhr.send(jsonPayload);
 	}
 	catch(err)
@@ -70,12 +72,13 @@ function doLogin()
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	//console.log(jsonPayload);
 	try
 	{
 		xhr.onreadystatechange = function()
 		{
 
-            document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText;
+      		document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText;
 			if (this.readyState == 4 && this.status == 200)
 			{
 
@@ -165,17 +168,13 @@ function addContact(event)
 	document.getElementById("contactAddResult").innerHTML = "";
 
 	error = "";
-	userID = 0;
 
-	firstName = "";
-	lastName = "";
-
-	firstName = document.getElementById("add_name").value; //add these id values to addContact form input
-	lastName = document.getElementById("add_lastname").value;
+	var fN = document.getElementById("add_name").value; //add these id values to addContact form input
+	var lN = document.getElementById("add_lastname").value;
 	var phoneNumber = document.getElementById("add_phonenumber").value;
 	var email = document.getElementById("add_email").value;
 
-	var jsonPayload = JSON.stringify({firstName:firstName, lastName:lastName, phonenumber:phoneNumber, email:email, userid:1});
+	var jsonPayload = JSON.stringify({firstName:fN, lastName:lN, phonenumber:phoneNumber, email:email, userid: userId});
 
 	var url = urlBase + '/AddContact.' + extension;
 	var xhr = new XMLHttpRequest();
@@ -230,6 +229,7 @@ function searchContact()
 					contactList += jsonObject.results[i];
 					if( i < jsonObject.results.length - 1 )
 					{
+						//contact list printed should provide contact id
 						contactList += "<br />\r\n";
 					}
 				}
