@@ -1,491 +1,398 @@
-//TODO:
-//Finish Update/Delete (Determine if update is needed, complete delete function)
-//Connect to API
-
 var urlBase = 'http://contactmaster.xyz/LAMPAPI';
-var extension = 'php';
 
 var userId = 0;
 var firstName = "";
 var lastName = "";
+var curRow = null;
+var curContact = 0;
 
-function doRegistration()
-{
-	//This is only needed to change the change active accounts login/logout
-	/*userID = 0;
-	firstName = "";
-	lastName = "";
-	error = "";*/
-
-	//This is the data sendinf payload variables
-	var fN = document.getElementById("FirstName").value; //add these id values to registration form input
-	var lN = document.getElementById("LastName").value;
-
-	var login = document.getElementById("Login").value;
-	var password = document.getElementById("passCon").value;
-
-	var jsonPayload = JSON.stringify({firstName:fN, lastName:lN, login:login, password:password});
-
-
-	var url = urlBase + '/Registration.' + extension;
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				newForm.style.display = "none";
-				document.getElementById("regResult").innerHTML = "Registration Complete. Close the menu and login.";
-			}
-		};
-
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("regResult").innerHTML = err.message;
-	}
+function displaySuccess(msg) {
+  var x = document.getElementById("greenSnackbar");
+  x.innerHTML = msg;
+  x.className = "show";
+  setTimeout(function() {x.className = x.className.replace("show", "");}, 3000);
 }
 
-
-function doLogin()
-{
-	userId = 0;
-	firstName = "";
-	lastName = "";
-
-	var login = document.getElementById("loginName").value;
-	var password = document.getElementById("loginPassword").value;
-
-	document.getElementById("loginResult").innerHTML = "";
-
-	var tmp = {login:login,password:password};
-	var jsonPayload = JSON.stringify( tmp );
-
-	var url = urlBase + '/Login.' + extension;
-
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	//console.log(jsonPayload);
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-
-      		document.getElementById("loginResult").innerHTML = this.readyState + " " + this.status + " " + this.statusText;
-			if (this.readyState == 4 && this.status == 200)
-			{
-
-
-				var jsonObject = JSON.parse( xhr.responseText );
-				userId = jsonObject.id;
-
-				if( userId < 1 )
-				{
-					document.getElementById("loginResult").innerHTML = "User/Password combination incorrect";
-					return;
-				}
-
-				firstName = jsonObject.firstName;
-				lastName = jsonObject.lastName;
-
-				saveCookie();
-
-				window.location.href = "user.html";
-			}
-		};
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("loginResult").innerHTML = err.message;
-	}
-
-    //document.getElementById("loginResult").innerHTML = "Gottem";
+function displayError(err) {
+  var x = document.getElementById("redSnackbar");
+  x.innerHTML = err;
+  x.className = "show";
+  setTimeout(function() {x.className = x.className.replace("show", "");}, 3000);
 }
 
-function saveCookie()
-{
-	var minutes = 20;
-	var date = new Date();
-	date.setTime(date.getTime()+(minutes*60*1000));
-	document.cookie = "firstName=" + firstName + ",lastName=" + lastName + ",userId=" + userId + ";expires=" + date.toGMTString();
+function saveCookie() {
+  var minutes = 20;
+  var date = new Date();
+  date.setTime(date.getTime()+(minutes*60*1000));
+  document.cookie = "firstName=" + firstName + ",lastName=" + lastName + ",userId=" + userId + ";expires=" + date.toGMTString();
 }
 
-function readCookie()
-{
-	userId = -1;
-	var data = document.cookie;
-	var splits = data.split(",");
-	for(var i = 0; i < splits.length; i++)
-	{
-		var thisOne = splits[i].trim();
-		var tokens = thisOne.split("=");
-		if( tokens[0] == "firstName" )
-		{
-			firstName = tokens[1];
-		}
-		else if( tokens[0] == "lastName" )
-		{
-			lastName = tokens[1];
-		}
-		else if( tokens[0] == "userId" )
-		{
-			userId = parseInt( tokens[1].trim() );
-		}
-	}
+function readCookie() {
+  userId = 0;
+  var data = document.cookie;
+  var splits = data.split(",");
 
-	if( userId < 0 )
-	{
-		window.location.href = "index.html";
-	}
-	else
-	{
-		document.getElementById("userName").innerHTML = "Logged in as " + firstName + " " + lastName;
-	}
+  for (var i = 0; i < splits.length; i++) {
+    var thisOne = splits[i].trim();
+    var tokens = thisOne.split("=");
+
+    if(tokens[0] == "firstName") {
+      firstName = tokens[1];
+    } else if(tokens[0] == "lastName") {
+      lastName = tokens[1];
+    } else if(tokens[0] == "userId") {
+      userId = parseInt(tokens[1].trim());
+    }
+  }
+
+  if(userId < 1) {
+    window.location.href = "index.html";
+  } else {
+    document.getElementById("resultsTitle").innerHTML = "Contacts of " + firstName + " " + lastName;
+  }
 }
 
+function doLogin() {
+  userId = 0;
+  firstName = "";
+  lastName = "";
 
-function doLogout()
-{
-	userId = 0;
-	firstName = "";
-	lastName = "";
-	document.cookie = "firstName= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
-	window.location.href = "index.html";
+  var login = document.getElementById("login").value;
+  var password = document.getElementById("password").value;
+
+  var jsonPayload = JSON.stringify({login:login, password:password});
+  var url = urlBase + '/Login.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        userId = jsonObject.id;
+
+        if(userId < 1) {
+          displayError("Username/Password combination is incorrect")
+          return;
+        }
+
+        firstName = jsonObject.firstName;
+        lastName = jsonObject.lastName;
+
+        saveCookie();
+        window.location.href = "user.html";
+      }
+    };
+
+    xhr.send(jsonPayload);
+
+  } catch(err) {
+    displayError(err.message);
+  }
 }
 
-
-// Add - new Contacts
-function addContact(event)
-{
-	document.getElementById("contactAddResult").innerHTML = "";
-
-	error = "";
-
-	var fN = document.getElementById("add_name").value; //add these id values to addContact form input
-	var lN = document.getElementById("add_lastname").value;
-	var phoneNumber = document.getElementById("add_phonenumber").value;
-	var email = document.getElementById("add_email").value;
-
-	var jsonPayload = JSON.stringify({firstName:fN, lastName:lN, phonenumber:phoneNumber, email:email, userid: userId});
-
-	var url = urlBase + '/AddContact.' + extension;
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				document.getElementById("contactAddResult").innerHTML = "Contact has been added, you may close the form.";
-				addForm.style.display = "none";
-			}
-		};
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("contactAddResult").innerHTML = err.message;
-	}
+function doLogout() {
+  userId = 0;
+  firstName = "";
+  lastName = "";
+  document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  window.location.href = "index.html";
 }
 
+function addUser() {
+  userId = 0;
 
-//Search values
-function searchContact()
-{
-	var srch = document.getElementById("searchText").value;
-	document.getElementById("contactSearchResult").innerHTML = "";
+  firstName = document.getElementById("firstName").value;
+  lastName = document.getElementById("lastName").value;
+  var login = document.getElementById("newLogin").value;
+  var password = document.getElementById("newPassword").value;
+  var passwordConfirm = document.getElementById("newPasswordConfirm").value;
 
-	var contactList = "";
+  if (!firstName) {
+    displayError("Missing first name");
+    return;
+  } else if (!login){
+    displayError("Missing username");
+    return;
+  } else if (!password) {
+    displayError("Missing password");
+    return;
+  } else if (password != passwordConfirm) {
+    displayError("Passwords do not match");
+    return;
+  }
 
-	var tmp = {search:srch,userId:userId};
-	var jsonPayload = JSON.stringify( tmp );
+  var jsonPayload = JSON.stringify({login:login, password:password});
+  var url = urlBase + '/Registration.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 
-	var url = urlBase + '/SearchContact.' + extension;
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        userId = jsonObject.id;
 
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				document.getElementById("contactSearchResult").innerHTML = "Contact(s) has been retrieved";
-				var jsonObject = JSON.parse( xhr.responseText );
+        if(userId < 1) {
+          displayError("Username not available");
+          return;
+        }
 
-				for( var i = 0; i < jsonObject.results.length; i++ )
-				{
-					contactList += jsonObject.results[i];
-					if( i < jsonObject.results.length - 1 )
-					{
-						//contact list printed should provide contact id
-						contactList += "<br />\r\n";
-					}
-				}
-				document.getElementsByTagName("p").style.display = "inline-block"
-				document.getElementsByTagName("p")[0].innerHTML = contactList;
-			}
-		};
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("contactSearchResult").innerHTML = err.message;
-	}
+        saveCookie();
+        window.location.href = "user.html";
+      }
+    };
+
+    xhr.send(jsonPayload);
+
+  } catch(err) {
+    displayError(err.message);
+  }
 }
 
-// Update values... is update needed or does add color work for updating DB data
-function updateValue(){
-	//Find contact id via conneciton to search OR have user input manually after searching separately?
-	//IF update value loops in contactid data from search
+function addContact() {
+  var qFirstName = document.getElementById("qFirstName").value;
+  var qLastName = document.getElementById("qLastName").value;
+  var qPhonenumber = document.getElementById("qPhonenumber").value;
+  var qEmail = document.getElementById("qEmail").value;
 
-	var contactID = document.getElementById("cID").value;
-	var update = document.getElementById("updateText").value;
-	var cat = document.getElementById("valueCat").value;
-	var blank = "";
-	document.getElementById("updateValueResult").innerHTML = "";
-	var tmp;
+  if (!qFirstName && !qLastName) {
+    displayError("Missing name for new contact");
+    return;
+  }
 
-	if(cat == "NA"){
-		return false;
-	}else{
-		if(cat == "FN"){
-				 tmp = {firstName:update, lastName:blank, phonenumber:blank, email:blank, contactid:contactID, userid:userId};
-		}
-		if(cat == "LN"){
-					tmp = {firstName:blank, lastName:update, phonenumber:blank, email:blank, contactid:contactID, userid:userId};
-		}
-		if(cat == "EM"){
-					tmp = {firstName:blank, lastName:blank, phonenumber:blank, email:update, contactid:contactID, userid:userId};
-		}
-		if(cat == "PN"){
-					tmp = {firstName:blank, lastName:blank, phonenumber:update, email:blank, contactid:contactID, userid:userId};
-		}
-	}
+  var jsonPayload = JSON.stringify({firstName:qFirstName,lastName:qLastName,phonenumber:qPhonenumber,email:qEmail,userid:userId});
+  var url = urlBase + '/AddContact.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 
-	var jsonPayload = JSON.stringify( tmp );
-	var url = urlBase + '/EditContact.' + extension;
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        var cid = jsonObject.id;
+        var qerr = jsonObject.error;
 
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-	try
-	{
-		xhr.onreadystatechange = function()
-		{
-			if (this.readyState == 4 && this.status == 200)
-			{
-				document.getElementById("updateValueResult").innerHTML = "Contact successfully edited";
+        if (qerr) {
+          displayError(qerr);
+          return;
+        } else {
+          displaySuccess("Successfully added contact");
+        }
 
-			}
-		};
-		xhr.send(jsonPayload);
-	}
-	catch(err)
-	{
-		document.getElementById("updateValueResult").innerHTML = err.message;
-	}
+        var table = document.getElementById("resultsBody");
+
+        var row = table.insertRow(-1);
+        var cell = row.insertCell(0);
+        cell.innerHTML = qFirstName;
+        cell = row.insertCell(1);
+        cell.innerHTML = qLastName;
+        cell = row.insertCell(2);
+        cell.innerHTML = qPhonenumber;
+        cell = row.insertCell(3);
+        cell.innerHTML = qEmail;
+        cell = row.insertCell(4);
+        cell.innerHTML = "<button id=\"updateButton\" onclick=\"openEdit(this,"+cid+")\">edit</button>";
+        cell = row.insertCell(5);
+        cell.innerHTML = "<button id=\"removeButton\" onclick=\"openDelete(this,"+cid+")\">delete</button>";
+      }
+    };
+
+    xhr.send(jsonPayload);
+
+  } catch(err) {
+    displayError(err.message);
+  }
 }
 
+function searchContact() {
+  var qFirstName = document.getElementById("qFirstName").value;
+  var qLastName = document.getElementById("qLastName").value;
+  var qPhonenumber = document.getElementById("qPhonenumber").value;
+  var qEmail = document.getElementById("qEmail").value;
 
+  var jsonPayload = JSON.stringify({firstName:qFirstName,lastName:qLastName,phonenumber:qPhonenumber,email:qEmail,userid:userId});
+  var url = urlBase + '/SearchContact.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 
-// Delete values -- incomplete
-function deleteValue(){
-	var del = document.getElementById("updateText").value;
-	var cat = document.getElementById("valueCat").value;
+  document.getElementById("resultsBody").innerHTML = "";
 
-	//delete the value from data
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        var results = jsonObject.results;
+        var qerr = jsonObject.error;
+
+        if (qerr) {
+          displayError(qerr);
+          return;
+        } else {
+          displaySuccess("Successfully retrieved contacts");
+        }
+
+        var table = document.getElementById("resultsBody");
+        for (var i=0; i<results.length; i++) {
+          var row = table.insertRow(i);
+          var cell = row.insertCell(0);
+          cell.innerHTML = results[i].firstName;
+          cell = row.insertCell(1);
+          cell.innerHTML = results[i].lastName;
+          cell = row.insertCell(2);
+          cell.innerHTML = results[i].phonenumber;
+          cell = row.insertCell(3);
+          cell.innerHTML = results[i].email;
+          cell = row.insertCell(4);
+          cell.innerHTML = "<button id=\"updateButton\" onclick=\"openEdit(this,"+results[i].id+")\">edit</button>";
+          cell = row.insertCell(5);
+          cell.innerHTML = "<button id=\"removeButton\" onclick=\"openDelete(this,"+results[i].id+")\">delete</button>";
+        }
+      }
+    };
+
+    xhr.send(jsonPayload);
+
+  } catch(err) {
+    displayError(err.message);
+  }
 }
 
-//----------Registration and Add Contact Form Overlay & Validation----------
-function openFormReg(){
-	document.getElementById("regOverlay").style.display = "block";
-}
-function openFormAdd(){
-	document.getElementById("addOverlay").style.display = "block";
-}
-function closeFormReg(){
-	document.getElementById("regOverlay").style.display = "none";
+function openEdit(button, cid) {
+  curRow = button.parentNode.parentNode;
+  curContact = cid;
 
-	//makes the form reappear if opened again
-	if(newForm.style.display == "none"){
-		//newForm.style.display = "inline";
-		location.reload();
-		return false;
+  var cells = curRow.getElementsByTagName("td");
+  document.getElementById("eFirstName").value = cells[0].innerHTML;
+  document.getElementById("eLastName").value = cells[1].innerHTML;
+  document.getElementById("ePhonenumber").value = cells[2].innerHTML;
+  document.getElementById("eEmail").value = cells[3].innerHTML;
 
-	} else {
-
-		var num = document.getElementsByClassName("loginResult");
-		var inputs = newForm.elements;
-
-		//clears all input fields, except for the button
-		for (i = 0; i < inputs.length; i++) {
-		  if (inputs[i].nodeName === "INPUT" && inputs[i].type === "text" || inputs[i].nodeName === "INPUT" && inputs[i].type === "password" || inputs[i].nodeName === "INPUT" && inputs[i].type === "email") {
-		    // Update text input
-		    inputs[i].value = "";
-		  }
-		}
-
-		//iterate between each span and make innerHTML "" (blank) to avoid buildup
-		for(var i = 0; i < num.length; i++){
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-	}
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("editForm").style.display = "block";
 }
 
-//Closes Add Contact Form
-function closeFormAdd(){
-	document.getElementById("addOverlay").style.display = "none";
+function closeEdit() {
+  curRow = null;
+  curContact = 0;
 
-	//makes the form reappear if opened again
-	if(addForm.style.display == "none"){
-		//newForm.style.display = "inline";
-		location.reload();
-		return false;
+  document.getElementById("eFirstName").value = "";
+  document.getElementById("eLastName").value = "";
+  document.getElementById("ePhonenumber").value = "";
+  document.getElementById("eEmail").value = "";
 
-	} else {
-
-		var num = document.getElementsByClassName("loginResult");
-		var inputs = addForm.elements;
-
-		//clears all input fields, except for the button
-		for (i = 0; i < inputs.length; i++) {
-		  if (inputs[i].nodeName === "INPUT" && inputs[i].type === "text" || inputs[i].nodeName === "INPUT" && inputs[i].type === "email") {
-		    // Update text input
-		    inputs[i].value = "";
-		  }
-		}
-
-		//iterate between each span and make innerHTML "" (blank) to avoid buildup
-		for(var i = 0; i < num.length; i++){
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-	}
+  document.getElementById("editForm").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
 }
 
+function editContact() {
+  var eFirstName = document.getElementById("eFirstName").value;
+  var eLastName = document.getElementById("eLastName").value;
+  var ePhonenumber = document.getElementById("ePhonenumber").value;
+  var eEmail = document.getElementById("eEmail").value;
 
-//Registration Form
-var newForm = document.getElementById("regForm");
-var addForm = document.getElementById("addForm");
+  var jsonPayload = JSON.stringify({firstName:eFirstName,lastName:eLastName,phonenumber:ePhonenumber,email:eEmail,contactid:curContact,userid:userId});
+  var url = urlBase + '/EditContact.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        var qerr = jsonObject.error;
 
-//Registration Validation/registration function
-if(newForm){
-	//Event listener for the submit button
-	newForm.addEventListener("submit", function(event){
-		//If form has been "submitted" without correct info before, returns html result spans to blank
-		var num = document.getElementsByClassName("loginResult");
-		for(var i = 0; i < num.length; i++){
-			//iterate between each span and make innerHTML "" (blank) to avoid buildup
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-		if( validateReg(event) ){
-			doRegistration();
-		}
-	});
+        if (qerr) {
+          displayError(qerr);
+          return;
+        } else {
+          displaySuccess("Successfully updated contact");
+        }
+
+        var cells = curRow.getElementsByTagName("td");
+        cells[0].innerHTML = eFirstName;
+        cells[1].innerHTML = eLastName;
+        cells[2].innerHTML = ePhonenumber;
+        cells[3].innerHTML = eEmail;
+
+        closeEdit();
+      }
+    };
+
+    xhr.send(jsonPayload);
+
+  } catch(err) {
+    displayError(err.message);
+  }
 }
 
-//AddContact validation and addContact() function
-if(addForm){
-	//Event listener for the submit button
-	addForm.addEventListener("submit", function(event){
-		var num = document.getElementsByClassName("loginResult");
-		for(var i = 0; i < num.length; i++){
-			//iterate between each span and make innerHTML "" (blank) to avoid buildup
-			document.getElementsByClassName("loginResult")[i].innerHTML = "";
-		}
-		if( validateAdd(event)){
-			if(!validEmail(event)){
-				return false;
-			}
-			addContact();
-		}
-	});
+function openDelete(button, cid) {
+  curRow = button.parentNode.parentNode;
+  curContact = cid;
+
+  var cells = curRow.getElementsByTagName("td");
+  var delCells = document.getElementById("deleteBody").getElementsByTagName("td")
+  delCells[0].innerHTML = cells[0].innerHTML;
+  delCells[1].innerHTML = cells[1].innerHTML;
+  delCells[2].innerHTML = cells[2].innerHTML;
+  delCells[3].innerHTML = cells[3].innerHTML;
+
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("deleteForm").style.display = "block";
 }
 
-//Validating Reg Form entries
-function validateReg(event){
+function closeDelete() {
+  curRow = null;
+  curContact = 0;
 
-	if( newForm.FirstName.value.length <= 1 ){
-		document.getElementById("firstResult").innerHTML = "Your first name must be at least 2 characters";
-    		return false;
+  var delCells = document.getElementById("deleteBody").getElementsByTagName("td")
+  delCells[0].innerHTML = "";
+  delCells[1].innerHTML = "";
+  delCells[2].innerHTML = "";
+  delCells[3].innerHTML = "";
 
-	} else if( newForm.LastName.value.length <= 1 ){
-		document.getElementById("lastResult").innerHTML = "Your last name must be at least 2 characters";
-    		return false;
-
-	} else if( newForm.Login.value.length < 4 || newForm.Login.value.length > 50){
-		document.getElementById("usernameResult").innerHTML = "Your username must be at least 4 characters";
-    		return false;
-
-	} else if(newForm.Password.value.length < 7){
-		document.getElementById("passResult").innerHTML = "Your Password must be at least 7 characters";
-		return false;
-
-	} else if(newForm.passCon.value != newForm.Password.value){
-		document.getElementById("passConResult").innerHTML = "Your passwords do not match";
-		return false;
-
-  	}else{
-    		return true;
-  	}
+  document.getElementById("deleteForm").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
 }
 
-function validateAdd(event){  // Validating Added Contact Entries, issues with checking email
+function deleteContact() {
+  var jsonPayload = JSON.stringify({contactid:curContact,userid:userId});
+  var url = urlBase + '/DeleteContact.php';
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
 
-	if( addForm.FirstName.value.length <= 1 ){
-		document.getElementById("addFirst").innerHTML = "First names must be at least 2 characters";
-		return false;
+  try {
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var jsonObject = JSON.parse(xhr.responseText);
+        var qerr = jsonObject.error;
 
-	} else if( addForm.LastName.value.length <= 1 ){
-		document.getElementById("addLast").innerHTML = "Last names must be at least 2 characters";
-		return false;
+        if (qerr) {
+          displayError(qerr);
+          return;
+        } else {
+          displaySuccess("Successfully deleted contact");
+        }
 
-	}else if(addForm.Phonenumber.value.length < 1){
-		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
-		return false;
+        document.getElementById("resultsTable").deleteRow(curRow.rowIndex);
+        closeDelete();
+      }
+    };
 
+    xhr.send(jsonPayload);
 
-	}else if( isNaN(addForm.Phonenumber.value) || addForm.Phonenumber.value.length != 10  ){
-		document.getElementById("addPhone").innerHTML = "Phone numbers must be 10 digits";
-		return false;
-
-
-	} else if( addForm.Email.value.length <= 1 || addForm.Email.value == ""){
-		document.getElementById("addEmail").innerHTML = "Please provide an email";
-		return false;
-
-	}else{
-		return true;
-	}
+  } catch(err) {
+    displayError(err.message);
+  }
 }
-
-//Checking for a valid email input
-function validEmail(event){
-	var email = addForm.Email.value;
-	at = email.indexOf("@");
-	dot = email.lastIndexOf(".");
-	if( at < 1 || (dot - at < 2) || dot == email.length ){
-		document.getElementById("addEmail").innerHTML = "Provided email is incorrect";
-		return false;
-	}
-	return true;
-}
-
 
 // Dynamic Background---------------------------------------------
-
 
 var canvas = document.getElementById("canvas"),
     ctx = canvas.getContext('2d');

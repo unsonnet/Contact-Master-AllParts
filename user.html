@@ -1,108 +1,109 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--Meta tags-->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Master</title>
 
-	<title>Contact Master</title>
-
-	<!-- Favicon -->
-	<link rel="shortcut icon" type="image/jpg" href="images/favicon.ico" />
-
-	<!-- Javascript and CSS files -->
-	<script type="text/javascript" src="js/code.js?version=1" defer></script>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <!--Java and CSS files-->
+  <script type="text/javascript" src="js/md5.js?version=1"></script>
+  <script type="text/javascript" src="js/code.js?version=1" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <link href="css/styles.css?version=1" rel="stylesheet">
-	<!--Fonts-->
-	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200&display=swap" rel="stylesheet">
 
-	//Commented out to see interface when @ user.html, remove comment to start JS/Connectivity
-	<script type="text/javascript">
-		document.addEventListener('DOMContentLoaded', function()
-		{
-			readCookie();
-		}, false);
-	</script>
+  <!--Fonts-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200&display=swap" rel="stylesheet">
 
+  <!--JS/Connectivity-->
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {readCookie();}, false);
+  </script>
 </head>
+
 <body>
-	<canvas id="canvas"></canvas>
-	<h1 id="title">Contact <span id="step">Master</span></h1>
-	<div id="contentBlock"> <!--Everything under title-->
+  <canvas id="canvas"></canvas>
+  <h1 id="title">Contact <span id="step">Master</span></h1>
 
-		<div id="loggedInDiv">
-			<span id="userName"></span>
-			<button type="button" id="logoutButton" onclick="doLogout();">Log Out</button>
-		</div>
+  <div id="whiteContainer">
+    <!--Querry block-->
+    <div style="display: flex; justify-content: space-evenly;">
+      <input class="query" type="text" id="qFirstName" placeholder="First Name">
+      <input class="query" type="text" id="qLastName" placeholder="Last Name">
+      <input class="query" type="text" id="qPhonenumber" placeholder="Phonenumber">
+      <input class="query" type="text" id="qEmail" placeholder="Email">
+      <button type="button" id="searchButton" onclick="searchContact();">Search</button>
+      <button type="button" id="addButton" onclick="addContact();">Add</button>
+    </div>
 
-		<div id="accessUIDiv">
+    <!--Result table-->
+    <table id="resultsTable" cellpadding=5pc>
+    <thead>
+      <tr style="background: transparent;">
+        <th colspan="5" id="resultsTitle">Contacts of John Wick</th>
+        <th>
+          <button type="button" id="logoutButton" onclick="doLogout()">Logout</button>
+        </th>
+      </tr>
+      <tr id="resultsHead">
+        <th width="21%">First Name</th>
+        <th width="21%">Last Name</th>
+        <th width="21%">Phonenumber</th>
+        <th width="21%">Email</th>
+        <th width="8%"></th>
+        <th width="8%"></th>
+      </tr>
+    </thead>
 
-			<!-- Search - Search Contacts;-->
-			<div class="queryBox">
-				<input type="text" class="RUDField" id="searchText" placeholder="Search Contacts"/>
-				<button type="button" class="queryBtn" id="searchContactButton" onclick="searchContact();"> Search </button>
-				<span class="loginResult" id="contactSearchResult"></span>
-				<p id="contactList"></p>
-			</div>
+    <tbody id="resultsBody">
+    </tbody>
+    </table>
+  </div>
 
-			<!-- Add Field - Add Contact; -->
-			<div class="queryBox">
+  <!--Overlaid Forms-->
+  <div id="overlay">
+    <div id="editForm">
+      <h3 style="text-align: center;">Edit Contact</h3>
+      <input class="form" type="text" id="eFirstName" placeholder="First Name">
+      <input class="form" type="text" id="eLastName" placeholder="Last Name">
+      <input class="form" type="text" id="ePhonenumber" placeholder="Phonenumber">
+      <input class="form" type="text" id="eEmail" placeholder="Email">
+      <div style="display: flex; justify-content: right;">
+        <button type="button" id="editButton" onclick="editContact();">Update</button>
+        <button type="button" id="closeEditButton" onclick="closeEdit();">Cancel</button>
+      </div>
+    </div>
 
-				<div id="addOverlay" class="overlay">
-					<span class="closeBtn" onclick="closeFormAdd();" title="Close Overlay">  &#215 </span>
-					<div class="wrap">
-						<h2 id="addTitle"> Add a contact </h2>
-							<p>Fill in the fields below</p>
-							<form id="addForm" onsubmit="return false;">
+    <div id="deleteForm">
+      <h3 style="text-align: center;">Are you sure you want to delete the following contact?</h3>
+      <table id="deleteTable" cellpadding=5pc>
+      <thead>
+        <tr id="deleteHead">
+          <th width="25%">First Name</th>
+          <th width="25%">Last Name</th>
+          <th width="25%">Phonenumber</th>
+          <th width="25%">Email</th>
+        </tr>
+      </thead>
 
-								<!--First Name-->
-								<input type="text" placeholder="First Name" name="FirstName" id="add_name"required>
-								<span class="loginResult" id="addFirst"></span>
+      <tbody id="deleteBody">
+        <td>First Name</td>
+        <td>Last Name</td>
+        <td>Phonenumber</td>
+        <td>Email</td>
+      </tbody>
+      </table>
+      <div style="display: flex; justify-content: right;">
+        <button type="button" id="deleteButton" onclick="deleteContact();">Delete</button>
+        <button type="button" id="closeDeleteButton" onclick="closeDelete();">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-								<!--Last Name-->
-								<input type="text" placeholder="Last Name" name="LastName" id="add_lastname">
-								<span class="loginResult" id="addLast"></span>
-
-								<!--Phone Number-->
-								<input type="text" placeholder="Phone Number" name="Phonenumber" id="add_phonenumber">
-								<span class="loginResult" id="addPhone"></span>
-
-								<!--Email-->
-								<input type="email" placeholder="Email" name="Email"id="add_email">
-								<span class="loginResult" id="addEmail"></span>
-
-								<input type="submit" value="Add Contact">
-							</form>
-							<span id="contactAddResult" class="loginResult"></span>
-					</div>
-				</div>
-
-				<!--Add Button, to open overlay-->
-				<button class="openBtn" id="addBtn" onclick="openFormAdd();">New Contact</button>
-			</div>
-
-			<!--Update Contact/Delete Contact-->
-			<div class="queryBox" id="UDQuery">
-				<input type="text" class="RUDField" id="cID" placeholder="Contact ID">
-				<input type="text" class="RUDField" id="updateText" placeholder="New Info.">
-				<label for="Category"> Category: </label>
-				<select class="form-control" id="valueCat" name="Category" required>
-					<option value="NA" selected> Select one</option>
-					<option value="FN">First Name</option>
-					<option value="LN">Last Name</option>
-					<option value="EM">Email</option>
-					<option value="PN">Phone Number</option>
-				</select>
-					<!--update/deleteValue not functioning yet-->
-				<div id="modButtons">
-					<button type="button" id="updateValueButton" class="buttons modButtons" onclick="updateValue();"> Update </button>
-					<button type="button" id="deleteValueButton" class="buttons modButtons" onclick="deleteValue();"> Delete </button>
-				</div>
-				<span class="loginResult" id="updateValueResult"></span>
-			</div>
-		</div>
-	</div>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+  <!--Popup-->
+  <div id="greenSnackbar"></div>
+  <div id="redSnackbar"></div>
 </body>
 </html>
