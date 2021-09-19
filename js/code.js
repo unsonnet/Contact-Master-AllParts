@@ -246,16 +246,64 @@ function searchContact()
 }
 
 // Update values... is update needed or does add color work for updating DB data
-/*function updateValue(){
+function updateValue(){
+	//Find contact id via conneciton to search OR have user input manually after searching separately?
+	//IF update value loops in contactid data from search
+
+	var contactID = document.getElementById("cID").value;
 	var update = document.getElementById("updateText").value;
 	var cat = document.getElementById("valueCat").value;
-	//update with updateText values
-}*/
+	document.getElementById("updateValueResult").innerHTML = "";
+	var tmp;
+
+	if(cat == "NA"){
+		return false;
+	}else{
+		if(cat == "FN"){
+				 tmp = {firstName:update, lastName:, phonenumber:, email:, contactid:contactID, userid:userId};
+		}
+		if(cat == "LN"){
+					tmp = {firstName:, lastName:update, phonenumber:, email:, contactid:contactID, userid:userId};
+		}
+		if(cat == "EM"){
+					tmp = {firstName:, lastName:, phonenumber:, email:update, contactid:contactID, userid:userId};
+		}
+		if(cat == "PN"){
+					tmp = {firstName:, lastName:, phonenumber:update, email:, contactid:contactID, userid:userId};
+		}
+	}
+
+	var jsonPayload = JSON.stringify( tmp );
+	var url = urlBase + '/EditContact.' + extension;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+	try
+	{
+		xhr.onreadystatechange = function()
+		{
+			if (this.readyState == 4 && this.status == 200)
+			{
+				document.getElementById("updateValueResult").innerHTML = "Contact successfully edited";
+
+			}
+		};
+		xhr.send(jsonPayload);
+	}
+	catch(err)
+	{
+		document.getElementById("updateValueResult").innerHTML = err.message;
+	}
+}
+
+
 
 // Delete values -- incomplete
 function deleteValue(){
 	var del = document.getElementById("updateText").value;
 	var cat = document.getElementById("valueCat").value;
+
 	//delete the value from data
 }
 
