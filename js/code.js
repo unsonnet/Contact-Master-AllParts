@@ -253,6 +253,7 @@ function updateValue(){
 	var contactID = document.getElementById("cID").value;
 	var update = document.getElementById("updateText").value;
 	var cat = document.getElementById("valueCat").value;
+	var blank = "";
 	document.getElementById("updateValueResult").innerHTML = "";
 	var tmp;
 
@@ -260,16 +261,16 @@ function updateValue(){
 		return false;
 	}else{
 		if(cat == "FN"){
-				 tmp = {firstName:update, lastName:, phonenumber:, email:, contactid:contactID, userid:userId};
+				 tmp = {firstName:update, lastName:blank, phonenumber:blank, email:blank, contactid:contactID, userid:userId};
 		}
 		if(cat == "LN"){
-					tmp = {firstName:, lastName:update, phonenumber:, email:, contactid:contactID, userid:userId};
+					tmp = {firstName:blank, lastName:update, phonenumber:blank, email:blank, contactid:contactID, userid:userId};
 		}
 		if(cat == "EM"){
-					tmp = {firstName:, lastName:, phonenumber:, email:update, contactid:contactID, userid:userId};
+					tmp = {firstName:blank, lastName:blank, phonenumber:blank, email:update, contactid:contactID, userid:userId};
 		}
 		if(cat == "PN"){
-					tmp = {firstName:, lastName:, phonenumber:update, email:, contactid:contactID, userid:userId};
+					tmp = {firstName:blank, lastName:blank, phonenumber:update, email:blank, contactid:contactID, userid:userId};
 		}
 	}
 
