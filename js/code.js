@@ -260,16 +260,16 @@ function updateValue(){
 		return false;
 	}else{
 		if(cat == "FN"){
-				 tmp = {firstName:update, lastName:, phonenumber:, email:, contactid:contactID, userId:userId};
+				 tmp = {firstName:update, lastName:, phonenumber:, email:, contactid:contactID, userid:userId};
 		}
 		if(cat == "LN"){
-					tmp = {firstName:, lastName:update, phonenumber:, email:, contactid:contactID, userId:userId};
+					tmp = {firstName:, lastName:update, phonenumber:, email:, contactid:contactID, userid:userId};
 		}
 		if(cat == "EM"){
-					tmp = {firstName:, lastName:, phonenumber:, email:update, contactid:contactID, userId:userId};
+					tmp = {firstName:, lastName:, phonenumber:, email:update, contactid:contactID, userid:userId};
 		}
 		if(cat == "PN"){
-					tmp = {firstName:, lastName:, phonenumber:update, email:, contactid:contactID, userId:userId};
+					tmp = {firstName:, lastName:, phonenumber:update, email:, contactid:contactID, userid:userId};
 		}
 	}
 
