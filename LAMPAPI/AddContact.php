@@ -13,7 +13,7 @@
 		$stmt->bind_param("ssssi", $inData["firstName"], $inData["lastName"], $inData["phonenumber"], $inData["email"], $inData["userid"]);
 		$stmt->execute();
 
-		returnWithError("");
+		returnWithInfo($conn->insert_id);
 
 		$stmt->close();
 		$conn->close();
@@ -29,7 +29,12 @@
 	}
 	
 	function returnWithError($err) {
-		$retValue = '{"error":"'.$err.'"}';
+		$retValue = '{"id":0, "error":"'.$err.'"}';
+		sendResultInfoAsJson($retValue);
+	}
+
+	function returnWithInfo($id) {
+		$retValue = '{"id":'.$id.', "error":""}';
 		sendResultInfoAsJson($retValue);
 	}
 ?>
